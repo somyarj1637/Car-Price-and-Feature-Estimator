@@ -1,11 +1,8 @@
-from asyncio.windows_utils import pipe
-from tkinter.tix import COLUMN
 from sklearn import set_config
 import pickle
 set_config(display='diagram')
 import pandas as pd
 import numpy as np
-from pyexpat import model
 import streamlit as st
 import matplotlib.pyplot as plt
 import seaborn as sns
