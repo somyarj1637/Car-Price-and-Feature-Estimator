@@ -1,4 +1,5 @@
 from asyncio.windows_utils import pipe
+from tkinter.tix import COLUMN
 from sklearn import set_config
 import pickle
 set_config(display='diagram')
@@ -20,54 +21,51 @@ st.title("Car Price and Feature Estimator")
 car=pickle.load(open('./model/car.pkl','rb'))
 predict_pipe=pickle.load(open('./model/predict_pipe.pkl','rb'))
 
+
 nav = st.sidebar.radio("Navigation",["Home","Analysis","Prediction","Contribute"])
 if nav == "Home":
     st.subheader("Car Details fetcher :")
-    make=st.selectbox('Car Company Name',['BMW', 'Audi', 'FIAT', 'Mercedes-Benz', 'Chrysler', 'Nissan',
-       'Volvo', 'Mazda', 'Mitsubishi', 'Ferrari', 'Alfa Romeo', 'Toyota',
-       'McLaren', 'Maybach', 'Pontiac', 'Porsche', 'Saab', 'GMC',
-       'Hyundai', 'Plymouth', 'Honda', 'Oldsmobile', 'Suzuki', 'Ford',
-       'Cadillac', 'Kia', 'Bentley', 'Chevrolet', 'Dodge', 'Lamborghini',
-       'Lincoln', 'Subaru', 'Volkswagen', 'Spyker', 'Buick', 'Acura',
-       'Rolls-Royce', 'Maserati', 'Lexus', 'Aston Martin', 'Land Rover',
-       'Lotus', 'Infiniti', 'Scion', 'Genesis', 'HUMMER', 'Tesla',
-       'Bugatti'])
-    st.table(car[car['Make']==make].sample(5))
+    
+    car_mod=car
+    car_mod['car_name']=car['Make']+" "+car['Model']
+    car_mod=car_mod.drop(columns=['Make','Model'])
+
+    def extract_feature(c_name):
+        s = car_mod.loc[car_mod['car_name'].str.contains(c_name, case=False)]
+        return s.head(5)
+    l=car_mod['car_name'].unique()
+    x_name=st.selectbox('Car Company Name',l)
+    st.text("Fetching the details of "+x_name)
+    top=extract_feature(x_name)
+    st.table(top)
 
 
 
 
 
     st.subheader('Graph Plots :')
-    graph = st.selectbox("What kind of Graph ? ",["Vehicle_Style vs Popularity","Interactive"])
+    graph = st.selectbox("What kind of Graph ? ",["Vehicle Style vs Popularity","Transmission Type","Vehicle Size","Brand Price"])
 
-    if graph=='Vehicle_Style vs Popularity':
+    if graph=='Vehicle Style vs Popularity':
         plt.figure(figsize=(50,20))
         sns.barplot(x=car['Vehicle Style'],y=car['Popularity'])
         plt.tight_layout()
         st.pyplot(plt)
-    if graph=='':
-        plt.figure(figsize=(50,20))
-        sns.barplot(x=car[''],y=car[''])
+    if graph=='Transmission Type':
+        plt.figure(figsize=(40,20))
+        car['Transmission Type'].value_counts().plot(kind='pie')
         plt.tight_layout()
         st.pyplot(plt)
-    if graph=='':
-        plt.figure(figsize=(50,20))
-        sns.barplot(x=car[''],y=car[''])
+    if graph=='Vehicle Size':
+        plt.figure(figsize=(40,20))
+        car['Vehicle Size'].value_counts().plot(kind='pie')
         plt.tight_layout()
         st.pyplot(plt)
-    if graph=='':
+    if graph=='Brand Price':
         plt.figure(figsize=(50,20))
-        sns.barplot(x=car[''],y=car[''])
+        sns.scatterplot(data=car,x='Make',y='MSRP')
         plt.tight_layout()
-        st.pyplot(plt)
-    if graph=='':
-        plt.figure(figsize=(50,20))
-        sns.barplot(x=car[''],y=car[''])
-        plt.tight_layout()
-        st.pyplot(plt)
-    
-        
+        st.pyplot(plt)  
 
     st.subheader('Pipeline used in this model :')
     st.image('./data/pipeline_pic.png')
