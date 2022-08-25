@@ -109,7 +109,7 @@ if nav == "Prediction":
 
 
     if st.button("Predict"):
-        st.success(f"Your predicted salary is {pred}")
+        st.success(f"Your predicted price is {pred}")
 
 
 
